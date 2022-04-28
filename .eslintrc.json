@@ -1,0 +1,12 @@
+{
+    "extends": ["react-app", "plugin:prettier/recommended"],
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "plugins": [
+      "prettier"
+    ],
+    "rules": {
+      "prettier/prettier": "error"
+    }
+  }
