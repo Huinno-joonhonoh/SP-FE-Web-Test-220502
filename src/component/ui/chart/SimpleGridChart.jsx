@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import styled, { useTheme } from 'styled-components';
 import ChartUtil from 'util/ChartUtil';
 import Highcharts from 'highcharts';
@@ -8,65 +8,30 @@ const Wrapper = styled.div`
   width: 100%;
 `;
 
-const Veil = styled.div`
-  position: absolute;
-  visibility: hidden;
-  width: 100%;
-  height: 100%;
-  background-color: ${(props) => props.theme.color.WHITE};
-  opacity: 0.66;
-  z-index: 2;
-`;
-
 const LINE_WIDTH = 1;
 const X_AXIS_TICK_LENGTH = 15;
 
-function getData(n) {
-  var arr = [],
-    i,
-    a,
-    b,
-    c,
-    spike;
-
-  for (i = 0; i < n; i = i + 1) {
-    if (i % 100 === 0) {
-      a = 50 * Math.random();
-    }
-    if (i % 1000 === 0) {
-      b = 50 * Math.random();
-    }
-    if (i % 10000 === 0) {
-      c = 50 * Math.random();
-    }
-    if (i % 50000 === 0) {
-      spike = 10;
-    } else {
-      spike = 0;
-    }
-    arr.push([
-      i,
-      (100 * Math.sin(i / 100) + a + b + c + spike + Math.random()) % 1.9,
-    ]);
-  }
-  return arr;
-}
-var n = 2500,
-  sampleData = getData(n);
-
 // https://github.com/highcharts/highcharts-react#options-details
-const generateChartOptions = (
-  data = [],
-  onClickChart,
-  isRecommended,
-  theme
-) => {
+/**
+ *
+ * @param {array} data
+ * @param {function} onClickChart
+ * @param {boolean} isRecommended
+ * @param {DefaultTheme} theme
+ * @returns
+ */
+const generateChartOptions = (data, onClickChart, theme) => {
   return {
     chart: {
-      margin: [0, 0, X_AXIS_TICK_LENGTH, 0],
+      margin: [
+        LINE_WIDTH,
+        LINE_WIDTH,
+        LINE_WIDTH + X_AXIS_TICK_LENGTH,
+        LINE_WIDTH,
+      ],
       // zoomType: 'x',
-      panning: true,
-      panKey: 'shift',
+      // panning: true,
+      // panKey: 'shift',
       plotBorderWidth: 0,
       borderWidth: 0,
       events: {
@@ -86,41 +51,17 @@ const generateChartOptions = (
             theme
           );
 
-          // 차트 데이터가 없을 경우 'None Found' 메시지 표시
-          if (chart.pointCount === 0) {
+          // 차트 데이터가 없을 경우 'No Data' 메시지 표시
+          if (!data?.length) {
             if (chart.customLabel) {
               chart.customLabel.destroy();
             }
             chart.customLabel = renderer
-              .label(
-                'None Found',
-                chart.plotWidth / 2 - 30,
-                chart.plotHeight / 2
-              )
+              .label('No Data', chart.plotWidth / 2 - 30, chart.plotHeight / 2)
               .attr({
                 zIndex: 5,
                 fontWeight: 600,
               })
-              .add();
-          }
-          if (isRecommended) {
-            if (chart.recommended) {
-              chart.recommended.destroy();
-            }
-            const { x, y, width, height } = chart.plotBox;
-
-            const strokeWidth = 1.5;
-            chart.recommended = renderer
-              .rect({
-                x: x + strokeWidth / 2,
-                y: y + strokeWidth / 2,
-                width: width - strokeWidth,
-                height: height - strokeWidth,
-                zIndex: 4,
-                stroke: theme.color.PRIMARY_BLUE,
-                'stroke-width': strokeWidth,
-              })
-              .attr({ className: 'RecommendedGridChart' })
               .add();
           }
         },
@@ -169,7 +110,7 @@ const generateChartOptions = (
       {
         data: data,
         lineWidth: LINE_WIDTH,
-        color: theme.color.RED,
+        color: theme.color.BLACK,
         pointPlacement: 'on',
         animation: false,
       },
@@ -221,37 +162,34 @@ function SimpleGridChart(props) {
 
   const {
     //
+    chartWidth,
+    chartHeight,
     data,
     onClickChart,
-    isRecommended,
-    width,
   } = props;
 
-  return (
-    <Wrapper>
-      {/* <Veil className="veil" /> */}
+  const chart = useMemo(
+    () => (
       <HighchartsReact
         highcharts={Highcharts}
-        options={generateChartOptions(
-          data ?? sampleData,
-          onClickChart,
-          isRecommended,
-          theme
-        )}
+        options={generateChartOptions(data, onClickChart, theme)}
         allowChartUpdate={true}
         immutable={false}
         updateArgs={[false, false, false]}
         containerProps={{
           className: 'chartContainer',
           style: {
-            width,
-            height: width * 0.12 + X_AXIS_TICK_LENGTH,
+            width: chartWidth,
+            height: chartHeight ?? chartWidth * 0.12 + X_AXIS_TICK_LENGTH,
           },
         }}
         callback={(chart) => {}}
       />
-    </Wrapper>
+    ),
+    [chartWidth, chartHeight, data]
   );
+
+  return <Wrapper>{chart}</Wrapper>;
 }
 
 export default SimpleGridChart;

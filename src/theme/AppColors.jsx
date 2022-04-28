@@ -1,19 +1,4 @@
 const AppColors = {
-  PRIMARY: '#3656ff',
-  PRIMARY_DARK: '#2942c0',
-  PRIMARY_BLUE: '#426AFF',
-
-  LIGHT_PRIMARY_BLUE: 'rgba(54, 86, 255, 0.15)',
-
-  SECONDARY: '#FFFFFF',
-  LIGHT_GREY_BB: '#bbbbbb',
-  LIGHT_GREY_EE: '#eeeeee',
-  DARK_GREY_77: '#777777',
-  DARK_GREY_33: '#333333',
-
-  ITEM_BORDER: '#cccccc',
-
-  // TODO: 위 COLOR는 제거 대상 임
   PRIMARY_BLUE: 'rgba(66,106,255,100%)',
   MEDIUM_PRIMARY_BLUE: 'rgba(66,106,255,50%)',
   MEDIUM_DARK_PRIMARY_BLUE: '#3350D4',
